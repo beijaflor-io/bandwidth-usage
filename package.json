@@ -1,0 +1,23 @@
+{
+  "name": "bandwidth-usage",
+  "version": "1.0.0",
+  "description": "Monitor bandwidth usage in Node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/yamadapc/bandwidth-usage.git"
+  },
+  "author": "Pedro Tacla Yamada",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yamadapc/bandwidth-usage/issues"
+  },
+  "homepage": "https://github.com/yamadapc/bandwidth-usage#readme",
+  "dependencies": {
+    "cap": "^0.1.1",
+    "humanize": "0.0.9"
+  }
+}
