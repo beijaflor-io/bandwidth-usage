@@ -14,6 +14,8 @@ Cap.deviceList().forEach((device) => {
     const link = c.open(device.name, '', bufSize, buffer);
     let totalIncoming = 0;
     let totalOutgoing = 0;
+    let incomingPerSec = 0;
+    let outgoingPerSec = 0;
 
     c.on('packet', (size) => {
       if (link === 'ETHERNET') {
@@ -21,7 +23,7 @@ Cap.deviceList().forEach((device) => {
 
         if (ret.info.type === PROTOCOL.ETHERNET.IPV4) {
           ret = decoders.IPV4(buffer, ret.offset);
-          if (ret.info.srcaddr === myip) {
+          if (ret.info.srcaddr !== myip) {
             totalIncoming += size;
             console.log(device.name, 'got incoming', humanize.filesize(size));
           } else {
@@ -31,8 +33,19 @@ Cap.deviceList().forEach((device) => {
         }
       }
 
+      console.log(device.name, 'incoming rate', humanize.filesize(incomingPerSec) + '/s');
+      console.log(device.name, 'outgoing rate', humanize.filesize(outgoingPerSec) + '/s');
       console.log(device.name, 'total incoming', humanize.filesize(totalIncoming));
       console.log(device.name, 'total outgoing', humanize.filesize(totalOutgoing));
     });
+
+    let lastTotalIncoming = totalIncoming || 0;
+    let lastTotalOutgoing = totalOutgoing || 0;
+    setInterval(() => {
+      incomingPerSec = Math.abs((totalIncoming - lastTotalIncoming));
+      lastTotalIncoming = totalIncoming;
+      outgoingPerSec = Math.abs((totalOutgoing - lastTotalOutgoing));
+      lastTotalOutgoing = totalOutgoing;
+    }, 1000);
   }
 });
