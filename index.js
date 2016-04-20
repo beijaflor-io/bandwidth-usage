@@ -50,6 +50,7 @@ function attachToDevice(device) {
       console.log(device.name, 'send rate', humanize.filesize(txPerSec) + '/s');
       console.log(device.name, 'total received', humanize.filesize(totalRx));
       console.log(device.name, 'total sent', humanize.filesize(totalTx));
+      console.log('---------');
     }, 2000);
   }
 }
