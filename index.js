@@ -9,7 +9,7 @@ const buffer = new Buffer(bufSize);
 const myip = '192.168.1.125';
 const deviceName = 'en0';
 
-Cap.deviceList().forEach((device) => {
+function attachToDevice(device) {
   if (deviceName && device.name !== deviceName) return;
 
   if (device.addresses.length) {
@@ -52,4 +52,6 @@ Cap.deviceList().forEach((device) => {
       console.log(device.name, 'total sent', humanize.filesize(totalTx));
     }, 2000);
   }
-});
+}
+
+Cap.deviceList().forEach(attachToDevice);
