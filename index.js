@@ -39,7 +39,7 @@ function BandwidthUsage(options) {
 util.inherits(BandwidthUsage, EventEmitter);
 
 BandwidthUsage.prototype.startSampler = function startLogger() {
-  setInterval(() => {
+  const run = () => {
     this.totalRx = this.devices.reduce((m, device) => {
       const monitor = this.monitors[device.name];
       return monitor.totalRx + m;
@@ -59,7 +59,9 @@ BandwidthUsage.prototype.startSampler = function startLogger() {
       const monitor = this.monitors[device.name];
       return monitor.txPerSec + m;
     }, 0);
-  }, 500);
+  };
+  setInterval(run, 500);
+  run();
 };
 
 BandwidthUsage.prototype.startTotalsLogger = function startTotalsLogger() {
