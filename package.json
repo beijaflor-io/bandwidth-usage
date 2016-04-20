@@ -18,6 +18,7 @@
   "homepage": "https://github.com/yamadapc/bandwidth-usage#readme",
   "dependencies": {
     "cap": "^0.1.1",
-    "humanize": "0.0.9"
+    "humanize": "0.0.9",
+    "my-local-ip": "^1.0.0"
   }
 }

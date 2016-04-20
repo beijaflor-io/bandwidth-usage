@@ -3,16 +3,17 @@ const Cap = require('cap').Cap;
 const EventEmitter = require('events');
 const decoders = require('cap').decoders;
 const humanize = require('humanize');
+const myLocalIp = require('my-local-ip');
 const util = require('util');
 
 const PROTOCOL = decoders.PROTOCOL;
 const bufSize = 10 * 1024 * 1024;
 const buffer = new Buffer(bufSize);
-const myip = '192.168.1.125';
 
 function BandwidthUsage(options) {
   if (!options) options = {};
   EventEmitter.call(this, options);
+  this.ip = myLocalIp;
 
   let devices = Cap.deviceList();
   if (options.interfaces) {
@@ -22,7 +23,7 @@ function BandwidthUsage(options) {
   this.monitors = {};
 
   devices.forEach((device) => {
-    this.monitors[device.name] = new DeviceMonitor(device);
+    this.monitors[device.name] = new DeviceMonitor(device, this.ip);
   });
 
   devices.forEach((device) => {
@@ -31,7 +32,7 @@ function BandwidthUsage(options) {
 }
 util.inherits(BandwidthUsage, EventEmitter);
 
-function DeviceMonitor(device) {
+function DeviceMonitor(device, ip) {
   const c = new Cap();
   const link = c.open(device.name, '', bufSize, buffer);
   this.totalRx = 0;
@@ -45,7 +46,7 @@ function DeviceMonitor(device) {
 
       if (ret.info.type === PROTOCOL.ETHERNET.IPV4) {
         ret = decoders.IPV4(buffer, ret.offset);
-        if (ret.info.srcaddr !== myip) {
+        if (ret.info.srcaddr !== ip) {
           this.totalRx += size;
         } else {
           this.totalTx += size;
