@@ -7,8 +7,11 @@ const PROTOCOL = decoders.PROTOCOL;
 const bufSize = 10 * 1024 * 1024;
 const buffer = new Buffer(bufSize);
 const myip = '192.168.1.125';
+const deviceName = 'en0';
 
 Cap.deviceList().forEach((device) => {
+  if (deviceName && device.name !== deviceName) return;
+
   if (device.addresses.length) {
     const c = new Cap();
     const link = c.open(device.name, '', bufSize, buffer);
@@ -25,18 +28,11 @@ Cap.deviceList().forEach((device) => {
           ret = decoders.IPV4(buffer, ret.offset);
           if (ret.info.srcaddr !== myip) {
             totalRx += size;
-            console.log(device.name, 'received', humanize.filesize(size));
           } else {
             totalTx += size;
-            console.log(device.name, 'sent', humanize.filesize(size));
           }
         }
       }
-
-      console.log(device.name, 'received rate', humanize.filesize(rxPerSec) + '/s');
-      console.log(device.name, 'send rate', humanize.filesize(txPerSec) + '/s');
-      console.log(device.name, 'total received', humanize.filesize(totalRx));
-      console.log(device.name, 'total sent', humanize.filesize(totalTx));
     });
 
     let lastTotalRx = totalRx || 0;
@@ -47,5 +43,13 @@ Cap.deviceList().forEach((device) => {
       txPerSec = Math.abs((totalTx - lastTotalTx));
       lastTotalTx = totalTx;
     }, 1000);
+
+
+    setInterval(() => {
+      console.log(device.name, 'received rate', humanize.filesize(rxPerSec) + '/s');
+      console.log(device.name, 'send rate', humanize.filesize(txPerSec) + '/s');
+      console.log(device.name, 'total received', humanize.filesize(totalRx));
+      console.log(device.name, 'total sent', humanize.filesize(totalTx));
+    }, 2000);
   }
 });
