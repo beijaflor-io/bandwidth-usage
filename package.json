@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/yamadapc/bandwidth-usage.git"
+    "url": "git+ssh://git@github.com/beijaflor-io/bandwidth-usage.git"
   },
   "author": "Pedro Tacla Yamada",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/yamadapc/bandwidth-usage/issues"
+    "url": "https://github.com/beijaflor-io/bandwidth-usage/issues"
   },
-  "homepage": "https://github.com/yamadapc/bandwidth-usage#readme",
+  "homepage": "https://github.com/beijaflor-io/bandwidth-usage#readme",
   "dependencies": {
     "cap": "^0.1.1",
     "humanize": "0.0.9",
