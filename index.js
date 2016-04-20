@@ -18,6 +18,8 @@ function BandwidthUsage(options) {
   let devices = Cap.deviceList();
   if (options.interfaces) {
     devices = devices.filter((d) => options.interfaces.indexOf(d.name) !== -1);
+  } else {
+    devices = devices.filter((d) => d.addresses.length);
   }
 
   this.monitors = {};
@@ -26,8 +28,55 @@ function BandwidthUsage(options) {
   devices.forEach((device) => {
     this.monitors[device.name] = new DeviceMonitor(device, this.ip);
   });
+
+  this.totalRx = -1;
+  this.totalTx = -1;
+  this.rxPerSec = -1;
+  this.txPerSec = -1;
+
+  this.startSampler();
 }
 util.inherits(BandwidthUsage, EventEmitter);
+
+BandwidthUsage.prototype.startSampler = function startLogger() {
+  setInterval(() => {
+    this.totalRx = this.devices.reduce((m, device) => {
+      const monitor = this.monitors[device.name];
+      return monitor.totalRx + m;
+    }, 0);
+
+    this.totalTx = this.devices.reduce((m, device) => {
+      const monitor = this.monitors[device.name];
+      return monitor.totalTx + m;
+    }, 0);
+
+    this.rxPerSec = this.devices.reduce((m, device) => {
+      const monitor = this.monitors[device.name];
+      return monitor.rxPerSec + m;
+    }, 0);
+
+    this.txPerSec = this.devices.reduce((m, device) => {
+      const monitor = this.monitors[device.name];
+      return monitor.txPerSec + m;
+    }, 0);
+  }, 500);
+};
+
+BandwidthUsage.prototype.startTotalsLogger = function startTotalsLogger() {
+  setInterval(() => {
+    console.log('received rate', humanize.filesize(this.rxPerSec) + '/s');
+    console.log('send rate', humanize.filesize(this.txPerSec) + '/s');
+    console.log('total received', humanize.filesize(this.totalRx));
+    console.log('total sent', humanize.filesize(this.totalTx));
+    console.log('---------');
+  }, 2000);
+};
+
+BandwidthUsage.prototype.startLoggers = function startLoggers() {
+  this.devices.forEach((device) => {
+    this.startLogger(this.monitors[device.name], device.name);
+  });
+};
 
 BandwidthUsage.prototype.startLogger = function startLogger(monitor, name) {
   setInterval(() => {
@@ -37,12 +86,6 @@ BandwidthUsage.prototype.startLogger = function startLogger(monitor, name) {
     console.log(name, 'total sent', humanize.filesize(monitor.totalTx));
     console.log('---------');
   }, 2000);
-};
-
-BandwidthUsage.prototype.startLoggers = function startLoggers() {
-  this.devices.forEach((device) => {
-    this.startLogger(this.monitors[device.name], device.name);
-  });
 };
 
 exports = module.exports = BandwidthUsage;
@@ -85,3 +128,6 @@ function DeviceMonitor(device, ip) {
 //
 // const b = new BandwidthUsage();
 // b.startLoggers();
+//
+// const b = new BandwidthUsage();
+// b.startTotalsLogger();
