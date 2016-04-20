@@ -81,4 +81,7 @@ function DeviceMonitor(device, ip) {
 }
 
 // const b = new BandwidthUsage();
+// setTimeout(() => console.log(b.monitors.en0.totalRx), 1000);
+//
+// const b = new BandwidthUsage();
 // b.startLoggers();
