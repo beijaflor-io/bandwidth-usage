@@ -12,10 +12,10 @@ Cap.deviceList().forEach((device) => {
   if (device.addresses.length) {
     const c = new Cap();
     const link = c.open(device.name, '', bufSize, buffer);
-    let totalIncoming = 0;
-    let totalOutgoing = 0;
-    let incomingPerSec = 0;
-    let outgoingPerSec = 0;
+    let totalRx = 0;
+    let totalTx = 0;
+    let rxPerSec = 0;
+    let txPerSec = 0;
 
     c.on('packet', (size) => {
       if (link === 'ETHERNET') {
@@ -24,28 +24,28 @@ Cap.deviceList().forEach((device) => {
         if (ret.info.type === PROTOCOL.ETHERNET.IPV4) {
           ret = decoders.IPV4(buffer, ret.offset);
           if (ret.info.srcaddr !== myip) {
-            totalIncoming += size;
-            console.log(device.name, 'got incoming', humanize.filesize(size));
+            totalRx += size;
+            console.log(device.name, 'received', humanize.filesize(size));
           } else {
-            totalOutgoing += size;
-            console.log(device.name, 'got outgoing', humanize.filesize(size));
+            totalTx += size;
+            console.log(device.name, 'sent', humanize.filesize(size));
           }
         }
       }
 
-      console.log(device.name, 'incoming rate', humanize.filesize(incomingPerSec) + '/s');
-      console.log(device.name, 'outgoing rate', humanize.filesize(outgoingPerSec) + '/s');
-      console.log(device.name, 'total incoming', humanize.filesize(totalIncoming));
-      console.log(device.name, 'total outgoing', humanize.filesize(totalOutgoing));
+      console.log(device.name, 'received rate', humanize.filesize(rxPerSec) + '/s');
+      console.log(device.name, 'send rate', humanize.filesize(txPerSec) + '/s');
+      console.log(device.name, 'total received', humanize.filesize(totalRx));
+      console.log(device.name, 'total sent', humanize.filesize(totalTx));
     });
 
-    let lastTotalIncoming = totalIncoming || 0;
-    let lastTotalOutgoing = totalOutgoing || 0;
+    let lastTotalRx = totalRx || 0;
+    let lastTotalTx = totalTx || 0;
     setInterval(() => {
-      incomingPerSec = Math.abs((totalIncoming - lastTotalIncoming));
-      lastTotalIncoming = totalIncoming;
-      outgoingPerSec = Math.abs((totalOutgoing - lastTotalOutgoing));
-      lastTotalOutgoing = totalOutgoing;
+      rxPerSec = Math.abs((totalRx - lastTotalRx));
+      lastTotalRx = totalRx;
+      txPerSec = Math.abs((totalTx - lastTotalTx));
+      lastTotalTx = totalTx;
     }, 1000);
   }
 });
